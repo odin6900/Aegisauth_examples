@@ -1,0 +1,9 @@
+name: aegisauth_example
+description: AegisAuth Dart Example
+version: 1.0.0
+
+environment:
+  sdk: '>=2.17.0 <4.0.0'
+
+dependencies:
+  crypto: ^3.0.3
