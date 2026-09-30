@@ -24,7 +24,6 @@
 #define PASSWORD     "YOUR_PASSWORD"
 #define MODULE_NAME  "minecraft"
 
-// Helper to extract JSON string property
 int ExtractJsonString(const char* json, const char* key, char* out, size_t maxLen) {
     char search[128];
     snprintf(search, sizeof(search), "\"%s\":", key);
@@ -47,7 +46,6 @@ int ExtractJsonString(const char* json, const char* key, char* out, size_t maxLe
     return 0;
 }
 
-// Perform HTTP POST request via WinINet
 int HttpPost(const char* endpoint, const char* jsonBody, const char* sessionToken, char* responseBuffer, DWORD bufferSize) {
     HINTERNET hInternet = InternetOpenA("AegisAuth-C/1.0", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
     if (!hInternet) return 0;

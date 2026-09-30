@@ -1,9 +1,16 @@
-name: aegisauth_example
-description: AegisAuth Dart Example
+name: aegis
+description: Official Aegis Authentication API SDK for Dart and Flutter.
 version: 1.0.0
+homepage: https://github.com/aegis
+publish_to: none
 
 environment:
-  sdk: '>=2.17.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
+  http: ^1.2.0
   crypto: ^3.0.3
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.24.0

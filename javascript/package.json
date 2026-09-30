@@ -1,9 +1,29 @@
 {
-  "name": "aegisauth-example-js",
+  "name": "@aegis/sdk-javascript",
   "version": "1.0.0",
-  "private": true,
+  "description": "Official Aegis Authentication API SDK for JavaScript (browser, Node 18+, Deno, Bun, workers).",
+  "license": "MIT",
   "type": "module",
+  "private": true,
+  "main": "./src/aegis.js",
+  "module": "./src/aegis.js",
+  "types": "./src/aegis.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/aegis.d.ts",
+      "default": "./src/aegis.js"
+    }
+  },
+  "files": [
+    "src",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "start": "node index.mjs"
+    "example": "node examples/quickstart.mjs"
   }
 }

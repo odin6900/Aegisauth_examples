@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Aegis JavaScript SDK — browser sample</title>
+  </head>
+  <body>
+    <form id="sign-in">
+      <input name="username" placeholder="Username" autocomplete="username" required />
+      <input
+        name="password"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
+        required
+      />
+      <button type="submit">Sign in</button>
+    </form>
+    <pre id="output"></pre>
+
+    <script type="module">
+      import { Aegis, AegisError } from "../src/aegis.js";
+
+      const output = document.getElementById("output");
+      const log = (line) => (output.textContent += `${line}\n`);
+
+      const aegis = new Aegis({
+        baseUrl: window.location.origin,
+        appKey: "YOUR_APP_KEY",
+        version: "1.0.0",
+      });
+
+      // Restore a session persisted from a previous visit.
+      aegis.useSession(localStorage.getItem("aegis_session"));
+      await aegis.init();
+      log(`authenticated: ${await aegis.isAuthenticated()}`);
+
+      document.getElementById("sign-in").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = new FormData(event.target);
+        try {
+          const auth = await aegis.login(form.get("username"), form.get("password"));
+          localStorage.setItem("aegis_session", aegis.sessionToken);
+          log(`signed in as ${auth.user?.username}`);
+          aegis.startHeartbeat({ onRevoked: (error) => log(`session ended: ${error.message}`) });
+        } catch (error) {
+          if (error instanceof AegisError) log(`error [${error.code}] ${error.message}`);
+          else throw error;
+        }
+      });
+    </script>
+  </body>
+</html>

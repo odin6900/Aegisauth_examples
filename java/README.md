@@ -1,36 +1,69 @@
-# AegisAuth — Java Example
+# Aegis SDK for Java
 
-Java 11+ client for **AegisAuth** demonstrating:
-1. Application initialization & update enforcement
-2. Platform HWID generation via `MessageDigest`
-3. User login and active subscription checks
-4. Requesting ephemeral signed download tokens for **AetherVault**
-5. Session termination
+Official client for the Aegis Authentication API. JDK 17+, zero third-party
+dependencies (uses `java.net.http` and a bundled minimal JSON codec).
 
-Uses built-in `java.net.http.HttpClient` (zero external dependencies).
+## Contents
 
----
+```
+src/main/java/io/aegis/sdk/Aegis.java           Client with every API operation
+src/main/java/io/aegis/sdk/AegisOptions.java    Configuration builder
+src/main/java/io/aegis/sdk/AegisException.java  Typed error codes
+src/main/java/io/aegis/sdk/HardwareId.java      Stable hardware id
+src/main/java/io/aegis/sdk/Json.java            Dependency-free JSON codec
+examples/                                       Runnable quickstart
+```
 
-## 🚀 Running the Example
+## Install
+
+No registry needed — unzip and build the folder:
 
 ```bash
-javac AegisAuthExample.java
-java AegisAuthExample
+mvn -q package        # target/aegis-sdk-1.0.0.jar
 ```
 
----
+Then add the jar to your classpath, or install it locally with
+`mvn install:install-file`.
 
-## ⚙️ Configuration
-
-Open `AegisAuthExample.java` and replace the placeholder constants:
+## Quickstart
 
 ```java
-private static final String AUTH_URL = "https://auth.example.com";
-private static final String APP_KEY = "YOUR_APP_KEY";
-private static final String APP_NAME = "My Application";
-private static final String APP_VERSION = "1.0.0";
+try (Aegis aegis = new Aegis(new AegisOptions("https://your-aegis-host", appKey).version("1.0.0"))) {
+    Map<String, Object> info = aegis.init();
 
-private static final String USERNAME = "YOUR_USERNAME";
-private static final String PASSWORD = "YOUR_PASSWORD";
-private static final String MODULE_NAME = "minecraft";
+    Map<String, Object> auth = aegis.login("ada", password);
+    System.out.println("signed in as " + ((Map<?, ?>) auth.get("user")).get("username"));
+
+    Map<String, Object> check = aegis.validateLicense("AEGS-4K7P-2M9X-QT31");
+    System.out.println(check.get("valid"));
+
+    aegis.setVariable("last_level", "12", "user", null);
+    System.out.println(aegis.getVariables("user", null).get("variables"));
+
+    aegis.startHeartbeat(Duration.ofSeconds(60), reason -> app.lock(reason));
+    aegis.logout();
+}
 ```
+
+## Supported operations
+
+`init`, `status`, `appData`, `register`, `login`, `logout`, `heartbeat`,
+`checkSession`, `isAuthenticated`, `useSession`, `userData`,
+`validateLicense`, `activateLicense`, `getVariables`, `setVariable`,
+`checkVersion`, `triggerWebhook`, plus `request()` for any endpoint added later.
+
+## Error handling
+
+```java
+try {
+    aegis.login(username, password);
+} catch (AegisException error) {
+    if ("hwid_mismatch".equals(error.getCode())) ui.show("Locked to another machine.");
+    else if (error.isNetworkError()) ui.show("Aegis is unreachable — retrying.");
+    else throw error;
+}
+```
+
+## License
+
+MIT — see `LICENSE`.

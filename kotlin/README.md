@@ -1,34 +1,68 @@
-# AegisAuth — Kotlin Example
+# Aegis SDK for Kotlin
 
-Kotlin JVM client for **AegisAuth** demonstrating:
-1. Application initialization & update enforcement
-2. Platform HWID generation using `MessageDigest`
-3. User login and active subscription checks
-4. Requesting ephemeral signed download tokens for **AetherVault**
-5. Clean logout
+Official client for the Aegis Authentication API. JVM 17+, zero third-party
+dependencies (JDK `HttpClient` plus a bundled JSON codec).
 
----
+## Contents
 
-## 🚀 Running the Example
-
-```bash
-kotlinc AegisAuthExample.kt -include-runtime -d AegisAuthExample.jar
-java -jar AegisAuthExample.jar
+```
+src/main/kotlin/io/aegis/sdk/Aegis.kt            Client
+src/main/kotlin/io/aegis/sdk/AegisException.kt   Typed errors
+src/main/kotlin/io/aegis/sdk/Json.kt             Bundled JSON codec
+src/main/kotlin/io/aegis/sdk/examples/           Sample application
+build.gradle.kts                                 Gradle build
 ```
 
----
+## Install
 
-## ⚙️ Configuration
-
-Open `AegisAuthExample.kt` and update the constants:
+No package registry — unzip and either open the folder in your IDE or add the
+sources to an existing Gradle module:
 
 ```kotlin
-const val AUTH_URL = "https://auth.example.com"
-const val APP_KEY = "YOUR_APP_KEY"
-const val APP_NAME = "My Application"
-const val APP_VERSION = "1.0.0"
-
-const val USERNAME = "YOUR_USERNAME"
-const val PASSWORD = "YOUR_PASSWORD"
-const val MODULE_NAME = "minecraft"
+// settings.gradle.kts
+includeBuild("libs/aegis-kotlin")
 ```
+
+```bash
+./gradlew build
+```
+
+## Quickstart
+
+```kotlin
+val aegis = Aegis(AegisOptions(baseUrl = "https://your-aegis-host", appKey = APP_KEY, version = "1.0.0"))
+aegis.init()
+
+val auth = aegis.login("ada", password)
+println(auth.obj("user").str("username"))
+
+aegis.validateLicense("AEGS-4K7P-2M9X-QT31")
+aegis.startHeartbeat { reason -> println("session ended: $reason") }
+aegis.logout()
+```
+
+## Supported operations
+
+`init`, `status`, `appData`, `register`, `login`, `logout`, `heartbeat`,
+`startHeartbeat`/`stopHeartbeat`, `checkSession`, `isAuthenticated`,
+`useSession`, `userData`, `validateLicense`, `activateLicense`,
+`getVariables`, `setVariable`, `checkVersion`, `downloads`, `triggerWebhook`,
+plus `request()` for any endpoint added later.
+
+## Error handling
+
+```kotlin
+try {
+    aegis.login(username, password)
+} catch (error: AegisException) {
+    when {
+        error.isLicenseError -> ui.show("License is not valid for this machine.")
+        error.isNetworkError -> ui.show("Aegis is unreachable — retrying.")
+        else -> throw error
+    }
+}
+```
+
+## License
+
+MIT — see `LICENSE`.
