@@ -40,9 +40,7 @@ namespace AegisAuth
     public sealed class api
     {
         /// <summary>Default platform endpoint. Override via the constructor for self-hosted deployments.</summary>
-        // Stable preview URL serving the latest backend build. Swap to the
-        // production URL (drop the "-dev") once the site is published.
-        public const string DefaultBaseUrl = "https://project--0e9bb1c8-e87c-49ee-832e-1356cbeaddb3-dev.lovable.app";
+        public const string DefaultBaseUrl = "https://aegisauth.realm.sryze.cc";
 
         private readonly string _baseUrl;
 
